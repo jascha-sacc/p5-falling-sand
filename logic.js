@@ -3,29 +3,29 @@ function setup() {
   createCanvas(320, 100);
   pixelDensity(1);
   background(100);
+  // frameRate(5)
 }
 
 function draw() {
 
-  if (grains.length) {
+  if (grains.length > 0) {
+    console.log(grains.length)
     let grain = grains.shift()
     let pixelBelow = grain[1]
     let pixelBelowAndLeft = pixelBelow - 4
     let pixelBelowAndRight = pixelBelow + 4
-    console.log(pixelBelow)
-    // console.log(moveBelow)
     let x = grain[2]
     let y = grain[3]
-    console.log(y)
     let d = grain[4]
     let off = grain[0]
     if (y == height - 1) {
       return
     }
+    // keeps pixel where it is if all three pixels below are occuppied
     if ((pixels[pixelBelow + 1] == 255) && (pixels[pixelBelowAndLeft + 1] == 255) && (pixels[pixelBelowAndRight + 1] == 255)) {
       return
     }
-    console.log(shouldPixelMove(pixelBelow))
+    // moves pixel down if space below is empty
     if (shouldPixelMove(pixelBelow)) {
       movePixelDown(off, pixelBelow, x, y, d)
     } else if (!(shouldPixelMove(pixelBelow)) && shouldPixelMove(pixelBelowAndLeft)) {
@@ -51,7 +51,7 @@ function mousePressed(e) {
   let d = pixelDensity();
   let off = (y * width + x) * d * 4;
   placePixel(off);
-  let pixelBelow = getPixelBelow(x, y, d)
+  let pixelBelow = off + width * 4
   grains.push([off, pixelBelow, x, y, d])
   // returns true or false
   return false;
@@ -70,17 +70,6 @@ function placePixel(off) {
 
 /**
  * 
- * @param {Number} y the y value repesnting the row the current pixel is on
- * @returns {Number} pixelBelow the number representing the position of the pixel below the current pixel
- */
-function getPixelBelow(x, y, d) {
-  let nextRow = (y + 1)
-  let pixelBelow = (nextRow * width + x) * d * 4;
-  return pixelBelow
-}
-
-/**
- * 
  * @param {Number} pixelBelow the position of the pixel below the current pixel
  * @returns {Boolean} whether or not the pixel can move to the space below
  */
@@ -91,11 +80,6 @@ function shouldPixelMove(pixel) {
   return pixels[pixel + 1] == 100
 }
 
-function shouldPixelMoveLeft() {
-  loadPixels()
-  return pixels
-}
-
 /**
  * 
  * @param {Number} off the beginning of the 4 digit pixel RGBA value
@@ -104,23 +88,18 @@ function shouldPixelMoveLeft() {
  * @param {Number} d the pixel density
  */
 
-function movePixelDown(off, pixelBelow, x, y, d) {
-  pixels[off + 1] = 100
+function movePixelDown(currentPixel, nextPixel, x, y, d) {
+  // empties current pixel
+  pixels[currentPixel + 1] = 100
   updatePixels();
-  pixels[pixelBelow + 1] = 255
+  // occupies next pixel
+  pixels[nextPixel + 1] = 255
   updatePixels();
 
-  // get x, y, d of pixelBelow and run it through equation again starting from shouldPixelMove
+  // get x, y, d of nextPixel and run it through equation again starting from shouldPixelMove
   let nextRow = y + 1
-  let nextPixelBelow = getPixelBelow(x, nextRow, d)
+  let nextNextPixel = nextPixel + width * 4
   // console.log(nextPixelBelow)
 
-  grains.push([pixelBelow, nextPixelBelow, x, nextRow, d])
-  // if (shouldPixelMove(nextPixelBelow)) {
-  //   setInterval(() => {
-  //     movePixelDown(pixelBelow, nextPixelBelow, x, nextRow, d);
-  //   }, 20);
-  // } else {
-  //   return false;
-  // }
+  grains.push([nextPixel, nextNextPixel, x, nextRow, d])
 }
