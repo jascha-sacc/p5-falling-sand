@@ -3,13 +3,12 @@ function setup() {
   createCanvas(320, 100);
   pixelDensity(1);
   background(100);
-  // frameRate(5)
+  frameRate(120)
 }
 
 function draw() {
 
   if (grains.length > 0) {
-    console.log(grains.length)
     let grain = grains.shift()
     let pixelBelow = grain[1]
     let pixelBelowAndLeft = pixelBelow - 4
@@ -28,9 +27,9 @@ function draw() {
     // moves pixel down if space below is empty
     if (shouldPixelMove(pixelBelow)) {
       movePixelDown(off, pixelBelow, x, y, d)
-    } else if (!(shouldPixelMove(pixelBelow)) && shouldPixelMove(pixelBelowAndLeft)) {
+    } else if (shouldPixelMove(pixelBelowAndLeft)) {
       movePixelDown(off, pixelBelowAndLeft, x, y, d)
-    } else if ((!shouldPixelMove(pixelBelow) && !shouldPixelMove(pixelBelowAndLeft))) {
+    } else {
       movePixelDown(off, pixelBelowAndRight, x, y, d)
     }
   }
@@ -40,12 +39,13 @@ function draw() {
  * 
  * @param {Event} e the mouse press event
  */
-function mousePressed(e) {
+function mouseDragged(e) {
+  noCursor()
   loadPixels();
   // console.log(e);
-  let x = e.x;
+  let x = mouseX
   // console.log(x)
-  let y = e.y;
+  let y = mouseY;
 
   // console.log(y)
   let d = pixelDensity();
@@ -62,7 +62,7 @@ function mousePressed(e) {
  * @param {Number} off the beginning of the 4 digit pixel RGBA value
  */
 function placePixel(off) {
-  loadPixels();
+  // loadPixels();
   // turn from background Grey to Green
   pixels[off + 1] = 255;
   updatePixels();
@@ -70,20 +70,20 @@ function placePixel(off) {
 
 /**
  * 
- * @param {Number} pixelBelow the position of the pixel below the current pixel
+ * @param {Number} pixel the position of the pixel below the current pixel
  * @returns {Boolean} whether or not the pixel can move to the space below
  */
 
 function shouldPixelMove(pixel) {
   // if this is true, the pixel below is empty
-  loadPixels()
+  // loadPixels()
   return pixels[pixel + 1] == 100
 }
 
 /**
  * 
- * @param {Number} off the beginning of the 4 digit pixel RGBA value
- * @param {Number} pixelBelow the beginning of the 4 digit pixel RGBA value below the off 
+ * @param {Number} currentPixel the beginning of the 4 digit pixel RGBA value
+ * @param {Number} nextPixel the beginning of the 4 digit pixel RGBA value below the off 
  * @param {Number} y the row of the next row below
  * @param {Number} d the pixel density
  */
@@ -91,7 +91,7 @@ function shouldPixelMove(pixel) {
 function movePixelDown(currentPixel, nextPixel, x, y, d) {
   // empties current pixel
   pixels[currentPixel + 1] = 100
-  updatePixels();
+  // updatePixels();
   // occupies next pixel
   pixels[nextPixel + 1] = 255
   updatePixels();
