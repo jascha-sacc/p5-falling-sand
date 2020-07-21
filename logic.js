@@ -3,36 +3,41 @@ function setup() {
   createCanvas(320, 100);
   pixelDensity(1);
   background(100);
-  frameRate(120)
+  frameRate(30)
 }
 
 function draw() {
 
   if (grains.length > 0) {
-    let grain = grains.shift()
-    let pixelBelow = grain[1]
-    let pixelBelowAndLeft = pixelBelow - 4
-    let pixelBelowAndRight = pixelBelow + 4
-    let x = grain[2]
-    let y = grain[3]
-    let d = grain[4]
-    let off = grain[0]
-    if (y == height - 1) {
-      return
-    }
-    // keeps pixel where it is if all three pixels below are occuppied
-    if ((pixels[pixelBelow + 1] == 255) && (pixels[pixelBelowAndLeft + 1] == 255) && (pixels[pixelBelowAndRight + 1] == 255)) {
-      return
-    }
-    // moves pixel down if space below is empty
-    if (shouldPixelMove(pixelBelow)) {
-      movePixelDown(off, pixelBelow, x, y, d)
-    } else if (shouldPixelMove(pixelBelowAndLeft)) {
-      movePixelDown(off, pixelBelowAndLeft, x, y, d)
-    } else {
-      movePixelDown(off, pixelBelowAndRight, x, y, d)
-    }
+    grains.forEach((grain, i) => {
+      let pixelBelow = grain[1]
+      let pixelBelowAndLeft = pixelBelow - 4
+      let pixelBelowAndRight = pixelBelow + 4
+      let x = grain[2]
+      let y = grain[3]
+      let d = grain[4]
+      let off = grain[0]
+      if (y == height - 1) {
+        return
+      }
+      // keeps pixel where it is if all three pixels below are occuppied
+      if ((pixels[pixelBelow + 1] == 255) && (pixels[pixelBelowAndLeft + 1] == 255) && (pixels[pixelBelowAndRight + 1] == 255)) {
+        return
+      }
+      // moves pixel down if space below is empty
+      if (shouldPixelMove(pixelBelow)) {
+        grains[i] = movePixelDown(off, pixelBelow, x, y, d)
+
+      } else if (shouldPixelMove(pixelBelowAndLeft)) {
+        grains[i] = movePixelDown(off, pixelBelowAndLeft, x, y, d)
+      } else if (!shouldPixelMove(pixelBelowAndLeft)) {
+        grains[i] = movePixelDown(off, pixelBelowAndRight, x, y, d)
+      } else {
+        grains.splice(i, 1)
+      }
+    })
   }
+  updatePixels();
 }
 
 /**
@@ -40,21 +45,17 @@ function draw() {
  * @param {Event} e the mouse press event
  */
 function mouseDragged(e) {
-  noCursor()
-  loadPixels();
-  // console.log(e);
-  let x = mouseX
-  // console.log(x)
-  let y = mouseY;
 
-  // console.log(y)
+  loadPixels();
+  let x = e.x
+  let y = e.y;
   let d = pixelDensity();
   let off = (y * width + x) * d * 4;
   placePixel(off);
+
+
   let pixelBelow = off + width * 4
   grains.push([off, pixelBelow, x, y, d])
-  // returns true or false
-  return false;
 }
 
 /**
@@ -94,12 +95,10 @@ function movePixelDown(currentPixel, nextPixel, x, y, d) {
   // updatePixels();
   // occupies next pixel
   pixels[nextPixel + 1] = 255
-  updatePixels();
 
   // get x, y, d of nextPixel and run it through equation again starting from shouldPixelMove
   let nextRow = y + 1
   let nextNextPixel = nextPixel + width * 4
   // console.log(nextPixelBelow)
-
-  grains.push([nextPixel, nextNextPixel, x, nextRow, d])
+  return [nextPixel, nextNextPixel, x, nextRow, d]
 }
