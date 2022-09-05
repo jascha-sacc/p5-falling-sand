@@ -1,12 +1,49 @@
-let grains = []
+var grains = [];
+var myColor = [255,255,125];
+var brushSize = 1;
+var brushSizeMin = 1;
+var density = 1;
+var densityMin = 1;
+var densityMax = 10;
+var gui;
+
 function setup() {
-  createCanvas(320, 100);
+  
+  createCanvas(1000,500);
   pixelDensity(1);
-  background(100);
-  frameRate(30)
+  background(100,100,100);
+  frameRate(30);
+  gui = createGui('Sand GUI');
+  gui.addGlobals('myColor','brushSize','density');
+
+
 }
 
 function draw() {
+  if(mouseIsPressed === true){
+
+
+    loadPixels();
+    let x = mouseX;
+    let y = mouseY;
+    let d = pixelDensity();
+    let off = (y * width + x) * d * 4;
+     
+    //place random pixels around the cetner of a circle at x,y with radius brush size
+    for(let i = 0;i<density;i++){ 
+      let r = brushSize * sqrt(random());
+      let theta = random() * 2 * PI;
+      let newX = round(x + r * cos(theta));
+      let newY = round(y + r * sin(theta));
+      let newOff = (newY*width + newX) * d * 4;
+     
+      placePixel(newOff);
+      let newPixelBelow = newOff + width*4;
+      grains.push([newOff,newPixelBelow,newX,newY,d]);
+    }
+    
+  }
+
 
   if (grains.length > 0) {
     grains.forEach((grain, i) => {
@@ -21,7 +58,9 @@ function draw() {
         return
       }
       // keeps pixel where it is if all three pixels below are occuppied
-      if ((pixels[pixelBelow + 1] == 255) && (pixels[pixelBelowAndLeft + 1] == 255) && (pixels[pixelBelowAndRight + 1] == 255)) {
+      if (((pixels[pixelBelow] != 100) || (pixels[pixelBelow+1] !=100) || (pixels[pixelBelow+2] !=100)) 
+        && ((pixels[pixelBelowAndLeft] != 100) || (pixels[pixelBelowAndLeft+1] !=100) || (pixels[pixelBelowAndLeft+2] !=100))
+        && ((pixels[pixelBelowAndRight] != 100) || (pixels[pixelBelowAndRight+1] !=100) || (pixels[pixelBelowAndRight+2] !=100))) {
         return
       }
       // moves pixel down if space below is empty
@@ -40,23 +79,7 @@ function draw() {
   updatePixels();
 }
 
-/**
- * 
- * @param {Event} e the mouse press event
- */
-function mouseDragged(e) {
 
-  loadPixels();
-  let x = e.x
-  let y = e.y;
-  let d = pixelDensity();
-  let off = (y * width + x) * d * 4;
-  placePixel(off);
-
-
-  let pixelBelow = off + width * 4
-  grains.push([off, pixelBelow, x, y, d])
-}
 
 /**
  * 
@@ -64,8 +87,10 @@ function mouseDragged(e) {
  */
 function placePixel(off) {
   // loadPixels();
-  // turn from background Grey to Green
-  pixels[off + 1] = 255;
+  // turn background the currently set color
+  pixels[off] = red(myColor);
+  pixels[off + 1] = green(myColor);
+  pixels[off + 2] = blue(myColor);
   updatePixels();
 }
 
@@ -78,7 +103,7 @@ function placePixel(off) {
 function shouldPixelMove(pixel) {
   // if this is true, the pixel below is empty
   // loadPixels()
-  return pixels[pixel + 1] == 100
+  return pixels[pixel] == 100 && pixels[pixel+1] == 100 && pixels[pixel+2] == 100
 }
 
 /**
@@ -91,10 +116,14 @@ function shouldPixelMove(pixel) {
 
 function movePixelDown(currentPixel, nextPixel, x, y, d) {
   // empties current pixel
+  pixels[currentPixel] = 100
   pixels[currentPixel + 1] = 100
+  pixels[currentPixel + 2] = 100
   // updatePixels();
   // occupies next pixel
-  pixels[nextPixel + 1] = 255
+  pixels[nextPixel] = red(myColor)
+  pixels[nextPixel + 1] = green(myColor)
+  pixels[nextPixel + 2] = blue(myColor)
 
   // get x, y, d of nextPixel and run it through equation again starting from shouldPixelMove
   let nextRow = y + 1
