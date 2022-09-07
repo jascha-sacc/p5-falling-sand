@@ -1,28 +1,51 @@
+/**
+ * Original Code by dengel29
+ * Extended by SpiralProgrammer to include:
+ *    GUI to control
+ *      Color
+ *      Brush Size
+ *      Sand Density
+ */
+
+
 var grains = [];
+
+//Gui Variables
 var myColor = [255,255,125];
 var brushSize = 1;
 var brushSizeMin = 1;
-var density = 1;
-var densityMin = 1;
-var densityMax = 10;
+var brushSizeMax = 100;
+
 var gui;
+var saveButton;
+
+
 
 function setup() {
   
   createCanvas(1000,500);
   pixelDensity(1);
   background(100,100,100);
-  frameRate(30);
-  gui = createGui('Sand GUI');
-  gui.addGlobals('myColor','brushSize','density');
+  
+  gui = createGui('Sand Color Picker');
+  gui.addGlobals('myColor');
 
+  saveButton = createButton('Save Your Sketch');
+  saveButton.position(width-150,25);
+  saveButton.mousePressed(saveTheSketch)
+
+
+  //draw a frame around the canvas
+  noFill();
+  strokeWeight(50);
+  rect(0,0,width,height)
 
 }
 
 function draw() {
+
+  //draw if the mouse is down
   if(mouseIsPressed === true){
-
-
     loadPixels();
     let x = mouseX;
     let y = mouseY;
@@ -30,21 +53,19 @@ function draw() {
     let off = (y * width + x) * d * 4;
      
     //place random pixels around the cetner of a circle at x,y with radius brush size
-    for(let i = 0;i<density;i++){ 
-      let r = brushSize * sqrt(random());
-      let theta = random() * 2 * PI;
-      let newX = round(x + r * cos(theta));
-      let newY = round(y + r * sin(theta));
-      let newOff = (newY*width + newX) * d * 4;
-     
-      placePixel(newOff);
-      let newPixelBelow = newOff + width*4;
-      grains.push([newOff,newPixelBelow,newX,newY,d]);
-    }
-    
-  }
+  
+    let r = brushSize * sqrt(random());
+    let theta = random() * 2 * PI;
+    let newX = round(x + r * cos(theta));
+    let newY = round(y + r * sin(theta));
+    let newOff = (newY*width + newX) * d * 4;
+   
+    placePixel(newOff);
+    let newPixelBelow = newOff + width*4;
+    grains.push([newOff,newPixelBelow,newX,newY,d]); 
+  } 
 
-
+  //check through each grain 
   if (grains.length > 0) {
     grains.forEach((grain, i) => {
       let pixelBelow = grain[1]
@@ -79,6 +100,15 @@ function draw() {
   updatePixels();
 }
 
+/**
+ * Saves and exports the sketch as a png
+ * 
+ */
+function saveTheSketch(){
+  saveCanvas('myCanvas','png');
+}
+
+
 
 
 /**
@@ -92,6 +122,26 @@ function placePixel(off) {
   pixels[off + 1] = green(myColor);
   pixels[off + 2] = blue(myColor);
   updatePixels();
+}
+
+/**
+ * 
+ * @param {event} Event sent to the function when mouse wheel is changed
+ * changes the brush size when the mouse wheel is moved
+ */
+
+function mouseWheel(event) {
+
+  //move the square according to the vertical scroll amount
+  if(brushSize-event.delta/100 > 0 && brushSize-event.delta/100 < brushSizeMax){
+    console.log(brushSize)
+    console.log("adjusting Brush");
+    brushSize -= event.delta/100; //scales down the event because typical delta ~100
+    console.log(brushSize,"new Size")
+  }
+  
+  //uncomment to block page scrolling
+  return false;
 }
 
 /**
