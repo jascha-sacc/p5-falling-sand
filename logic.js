@@ -136,7 +136,7 @@ function mouseWheel(event) {
   if(brushSize-event.delta/100 > 0 && brushSize-event.delta/100 < brushSizeMax){
     console.log(brushSize)
     console.log("adjusting Brush");
-    brushSize -= event.delta/100; //scales down the event because typical delta ~100
+    brushSize += event.delta/100; //scales down the event because typical delta ~100
     console.log(brushSize,"new Size")
   }
   
