@@ -28,7 +28,7 @@ function setup() {
   pixelDensity(1);
   background(100,100,100);
   
-  gui = createGui('Sand Color Picker');
+  gui = createGui('Snd Color Picker');
   gui.addGlobals('myColor');
 
   gui = createGui('Name');
