@@ -15,6 +15,7 @@ var myColor = [255,255,125];
 var brushSize = 1;
 var brushSizeMin = 1;
 var brushSizeMax = 100;
+var myName = "Your Name";
 
 var gui;
 var saveButton;
@@ -29,6 +30,9 @@ function setup() {
   
   gui = createGui('Sand Color Picker');
   gui.addGlobals('myColor');
+
+  gui = createGui('Name');
+  gui.addGlobals('myName');
 
   saveButton = createButton('Save Your Sketch');
   saveButton.position(width-150,25);
@@ -105,7 +109,7 @@ function draw() {
  * 
  */
 function saveTheSketch(){
-  saveCanvas('myCanvas','png');
+  saveCanvas(myName+"'s picture",'png');
 }
 
 
