@@ -30,8 +30,6 @@ function setup() {
   
   gui = createGui('Sand Color Picker');
   gui.addGlobals('myColor');
-
-  gui = createGui('Name');
   gui.addGlobals('myName');
 
   saveButton = createButton('Save Your Sketch');
