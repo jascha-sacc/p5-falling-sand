@@ -137,15 +137,16 @@ function placePixel(off) {
  */
 
 function mouseWheel(event) {
-
-  //move the square according to the vertical scroll amount
-  if(brushSize-event.delta/100 > 0 && brushSize-event.delta/100 < brushSizeMax){
-    console.log(brushSize)
-    console.log("adjusting Brush");
-    brushSize += event.delta/100; //scales down the event because typical delta ~100
-    console.log(brushSize,"new Size")
+  console.log(brushSize)
+  console.log("adjusting Brush");
+  brushSize += event.delta / 100; //scales down the event because typical delta ~100
+  if (brushSize < brushSizeMin) {
+    brushSize = brushSizeMin;
+  } else if (brushSize > brushSizeMax) {
+    brushSize = brushSizeMax;
   }
-  
+  console.log(brushSize, "new Size")
+
   //uncomment to block page scrolling
   return false;
 }
