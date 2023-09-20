@@ -55,16 +55,20 @@ function draw() {
     let off = (y * width + x) * d * 4;
      
     //place random pixels around the cetner of a circle at x,y with radius brush size
-  
-    let r = brushSize * sqrt(random());
-    let theta = random() * 2 * PI;
-    let newX = round(x + r * cos(theta));
-    let newY = round(y + r * sin(theta));
-    let newOff = (newY*width + newX) * d * 4;
-   
-    placePixel(newOff);
-    let newPixelBelow = newOff + width*4;
-    grains.push([newOff,newPixelBelow,newX,newY,d]); 
+
+    // grains increase with brushSize for speed and fun!
+    for (let i = 0; i < Math.floor(brushSize); i++) {
+
+      let r = brushSize * sqrt(random());
+      let theta = random() * 2 * PI;
+      let newX = round(x + r * cos(theta));
+      let newY = round(y + r * sin(theta));
+      let newOff = (newY * width + newX) * d * 4;
+
+      placePixel(newOff);
+      let newPixelBelow = newOff + width * 4;
+      grains.push([newOff, newPixelBelow, newX, newY, d]);
+    }
   } 
 
   //check through each grain 
