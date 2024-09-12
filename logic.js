@@ -24,7 +24,7 @@ var saveButton;
 
 function setup() {
   
-  createCanvas(1000,500);
+  createCanvas(1280,720);
   pixelDensity(1);
   background(100,100,100);
   
